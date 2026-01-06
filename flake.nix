@@ -37,6 +37,12 @@
             ];
             config = { };
           };
+          packages.default = pkgs.rustPlatform.buildRustPackage {
+            pname = "lat";
+            version = "0.1.0";
+            src = ./.;
+            cargoLock.lockFile = ./Cargo.lock;
+          };
           devShells.default = pkgs.mkShell {
             nativeBuildInputs = [
               (pkgs.rust-bin.stable."1.91.1".default.override {
