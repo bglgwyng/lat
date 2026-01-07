@@ -1,4 +1,3 @@
-use crate::upto::{UptoUnit, parse_upto};
 use kdl::{KdlDocument, KdlNode};
 use std::fs;
 use std::path::Path;
@@ -8,11 +7,11 @@ pub struct Rule {
     pub patterns: Vec<String>,
     pub command: String,
     pub args: Vec<String>,
-    default_upto: Option<UptoUnit>,
+    default_upto: Option<usize>,
 }
 
 impl Rule {
-    pub fn upto(&self, cli_upto: Option<UptoUnit>) -> Option<UptoUnit> {
+    pub fn upto(&self, cli_upto: Option<usize>) -> Option<usize> {
         cli_upto.or(self.default_upto)
     }
 }
@@ -74,9 +73,8 @@ impl Config {
         let default_upto = children
             .get("defaults")
             .and_then(|n| n.get("upto"))
-            .and_then(|v| v.as_string())
-            .map(|s| parse_upto(s))
-            .transpose()?;
+            .and_then(|v| v.as_integer())
+            .map(|n| n as usize);
 
         Ok(Rule {
             patterns,
@@ -149,7 +147,7 @@ mod tests {
                 rule "*.json" {
                     command "json-lat"
                     args "$FILE"
-                    defaults upto="500l"
+                    defaults upto=500
                 }
             "#;
             let doc: KdlDocument = kdl.parse().unwrap();
@@ -159,7 +157,7 @@ mod tests {
             assert_eq!(config.rules[0].patterns, vec!["*.json"]);
             assert_eq!(config.rules[0].command, "json-lat");
             assert_eq!(config.rules[0].args, vec!["$FILE"]);
-            assert_eq!(config.rules[0].upto(None), Some(UptoUnit::Lines(500)));
+            assert_eq!(config.rules[0].upto(None), Some(500));
         }
 
         #[test]
@@ -168,7 +166,7 @@ mod tests {
                 rule "*.js" "*.ts" "*.jsx" "*.tsx" {
                     command "js-lat"
                     args "$FILE" "--upto" "$UPTO"
-                    defaults upto="1000t"
+                    defaults upto=1000
                 }
             "#;
             let doc: KdlDocument = kdl.parse().unwrap();

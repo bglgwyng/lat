@@ -18,16 +18,16 @@ lat <FILE> [OPTIONS]
 
 ### Options
 
-- `-u, --upto <UPTO>` - Maximum amount to read (e.g., `100t` tokens, `500c` characters, `200l` lines)
+- `-u, --upto <UPTO>` - Maximum characters to read
 - `-f, --focus <FOCUS>` - Paths within the file to focus on, comma-separated
 
 ### Examples
 
 ```bash
 lat src/main.rs
-lat config.json -u 100l
+lat config.json -u 1000
 lat data.json -f users,posts
-lat big.json -u 500t -f data.items,data.metadata
+lat big.json -u 5000 -f data.items,data.metadata
 ```
 
 ## Configuration
@@ -38,25 +38,25 @@ lat big.json -u 500t -f data.items,data.metadata
 rule "*.json" {
     command "json-lat"
     args "$FILE" "$FOCUS"
-    defaults upto="500l"
+    defaults upto=5000
 }
 
 rule "*.js" "*.ts" "*.jsx" "*.tsx" {
     command "js-lat"
     args "$FILE"
-    defaults upto="1000t"
+    defaults upto=10000
 }
 
 rule "*.md" {
     command "cat"
     args "$FILE"
-    defaults upto="200l"
+    defaults upto=3000
 }
 
 rule "*" {
     command "cat"
     args "$FILE"
-    defaults upto="100l"
+    defaults upto=2000
 }
 ```
 

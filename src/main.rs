@@ -1,11 +1,9 @@
 mod config;
-mod upto;
 
 use clap::Parser;
 use config::{Rule, load_config};
 use std::path::Path;
 use std::process::Command;
-use upto::{UptoUnit, parse_upto};
 
 #[derive(Parser)]
 #[command(name = "lat")]
@@ -14,9 +12,9 @@ struct Args {
     /// 파일 경로 (예: big.json 또는 big.json:data.a_big_array)
     file: String,
 
-    /// 최대 읽을 양 (예: 100t=토큰, 100c=문자, 100l=라인)
+    /// 최대 읽을 글자수
     #[arg(short, long)]
-    upto: Option<String>,
+    upto: Option<usize>,
 
     /// 확대할 경로들 (예: data.items,data.users)
     #[arg(short, long, value_delimiter = ',')]
@@ -26,7 +24,7 @@ struct Args {
 fn substitute_args(
     args: &[String],
     file: &str,
-    upto: Option<UptoUnit>,
+    upto: Option<usize>,
     focus: Option<&[String]>,
 ) -> Vec<String> {
     let focus_str = focus.map(|f| f.join(",")).unwrap_or_default();
@@ -51,7 +49,7 @@ fn substitute_args(
 fn run_rule(
     rule: &Rule,
     file: &str,
-    upto: Option<UptoUnit>,
+    upto: Option<usize>,
     focus: Option<&[String]>,
 ) -> Result<(), String> {
     let args = substitute_args(&rule.args, file, upto, focus);
@@ -93,8 +91,8 @@ mod tests {
                 "--upto".to_string(),
                 "$UPTO".to_string(),
             ];
-            let result = substitute_args(&args, "test.json", Some(UptoUnit::Lines(100)), None);
-            assert_eq!(result, vec!["test.json", "--upto", "100l"]);
+            let result = substitute_args(&args, "test.json", Some(100), None);
+            assert_eq!(result, vec!["test.json", "--upto", "100"]);
         }
 
         #[test]
@@ -127,8 +125,8 @@ mod tests {
                 "--limit".to_string(),
                 "$UPTO".to_string(),
             ];
-            let result = substitute_args(&args, "data.json", Some(UptoUnit::Tokens(500)), None);
-            assert_eq!(result, vec!["--file", "data.json", "--limit", "500t"]);
+            let result = substitute_args(&args, "data.json", Some(500), None);
+            assert_eq!(result, vec!["--file", "data.json", "--limit", "500"]);
         }
     }
 }
@@ -157,18 +155,8 @@ fn main() {
         }
     };
 
-    // upto 파싱
-    let cli_upto = match &args.upto {
-        Some(s) => match parse_upto(s) {
-            Ok(u) => Some(u),
-            Err(e) => {
-                eprintln!("error parsing --upto: {}", e);
-                std::process::exit(1);
-            }
-        },
-        None => None,
-    };
-    let upto = rule.upto(cli_upto);
+    // upto: CLI 값 우선, 없으면 rule의 default
+    let upto = rule.upto(args.upto);
 
     let focus = args.focus.as_deref();
 
