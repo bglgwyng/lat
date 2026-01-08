@@ -1,6 +1,8 @@
-# Guide
+# lat
 
 `lat` is `cat` for LLMs. It outputs files in a format that LLMs can easily understand.
+
+## 
 
 ## Key Features
 
