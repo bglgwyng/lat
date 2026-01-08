@@ -40,21 +40,46 @@
             ];
             config = { };
           };
-          packages.default = pkgs.writeShellScriptBin "lat" ''
-            file="$1"
-            shift
-            case "$file" in
-              *.json)
-                exec ${inputs'.lat-json-viewer.packages.default}/bin/lat-json-viewer "$file" "$@"
-                ;;
-              *.js|*.ts|*.jsx|*.tsx|*.cjs|*.mjs)
-                exec ${inputs'.lat-js-viewer.packages.default}/bin/lat-js-viewer "$file" "$@"
-                ;;
-              *)
-                exec ${inputs'.lat-plaintext-viewer.packages.default}/bin/lat-plaintext-viewer "$file" "$@"
-                ;;
-            esac
-          '';
+          packages.default = pkgs.lib.makeOverridable (
+            {
+              rules ? [
+                {
+                  patterns = [ "*.json" ];
+                  handler = inputs'.lat-json-viewer.packages.default;
+                }
+                {
+                  patterns = [
+                    "*.js"
+                    "*.ts"
+                    "*.jsx"
+                    "*.tsx"
+                    "*.cjs"
+                    "*.mjs"
+                  ];
+                  handler = inputs'.lat-js-viewer.packages.default;
+                }
+              ],
+              fallback ? inputs'.lat-plaintext-viewer.packages.default,
+            }:
+            let
+              mkCase = rule: ''
+                ${builtins.concatStringsSep "|" rule.patterns})
+                  exec ${rule.handler}/bin/* "$file" "$@"
+                  ;;
+              '';
+              cases = builtins.concatStringsSep "\n" (map mkCase rules);
+            in
+            pkgs.writeShellScriptBin "lat" ''
+              file="$1"
+              shift
+              case "$file" in
+                ${cases}
+                *)
+                  exec ${fallback}/bin/* "$file" "$@"
+                  ;;
+              esac
+            ''
+          ) { };
           formatter = pkgs.nixfmt-rfc-style;
         };
     };
