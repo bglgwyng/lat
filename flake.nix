@@ -8,6 +8,9 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    lat-json-viewer.url = "git+ssh://git@github.com/bglgwyng/lat-json-viewer.git";
+    lat-js-viewer.url = "git+ssh://git@github.com/bglgwyng/lat-js-viewer.git";
+    lat-plaintext-viewer.url = "git+ssh://git@github.com/bglgwyng/lat-plaintext-viewer.git";
   };
 
   outputs =
@@ -37,19 +40,21 @@
             ];
             config = { };
           };
-          packages.default = pkgs.rustPlatform.buildRustPackage {
-            pname = "lat";
-            version = "0.1.0";
-            src = ./.;
-            cargoLock.lockFile = ./Cargo.lock;
-          };
-          devShells.default = pkgs.mkShell {
-            nativeBuildInputs = [
-              (pkgs.rust-bin.stable."1.91.1".default.override {
-                extensions = [ "rust-src" ];
-              })
-            ];
-          };
+          packages.default = pkgs.writeShellScriptBin "lat" ''
+            file="$1"
+            shift
+            case "$file" in
+              *.json)
+                exec ${inputs'.lat-json-viewer.packages.default}/bin/lat-json-viewer "$file" "$@"
+                ;;
+              *.js|*.ts|*.jsx|*.tsx|*.cjs|*.mjs)
+                exec ${inputs'.lat-js-viewer.packages.default}/bin/lat-js-viewer "$file" "$@"
+                ;;
+              *)
+                exec ${inputs'.lat-plaintext-viewer.packages.default}/bin/lat-plaintext-viewer "$file" "$@"
+                ;;
+            esac
+          '';
           formatter = pkgs.nixfmt-rfc-style;
         };
     };
