@@ -87,3 +87,11 @@ lat -c 100 big.json
 ```
 
 This is not a strict limit; actual output may be slightly longer.
+
+## For AI Agents
+
+Add this to your CLAUDE.md or AGENTS.md:
+
+```
+When reading files, use `lat <file>` instead of `cat`. Output is limited to 1000 characters by default (use `-c` to change). Omitted content is marked with anchors like `{: path :}`. To view omitted sections, run `lat -f <anchor> <file>`.
+```
