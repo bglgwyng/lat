@@ -8,9 +8,9 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    lat-json-viewer.url = "git+ssh://git@github.com/bglgwyng/lat-json-viewer.git";
-    lat-js-viewer.url = "git+ssh://git@github.com/bglgwyng/lat-js-viewer.git";
-    lat-plaintext-viewer.url = "git+ssh://git@github.com/bglgwyng/lat-plaintext-viewer.git";
+    lat-json-viewer.url = "github:bglgwyng/lat-json-viewer";
+    lat-js-viewer.url = "github:bglgwyng/lat-js-viewer";
+    lat-plaintext-viewer.url = "github:bglgwyng/lat-plaintext-viewer";
   };
 
   outputs =

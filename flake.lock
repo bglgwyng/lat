@@ -81,15 +81,15 @@
       "locked": {
         "lastModified": 1767878821,
         "narHash": "sha256-ysB3pC32q/ie1RWKdLoP1LOsbqm90j8NDxRzlUBsi84=",
-        "ref": "refs/heads/main",
+        "owner": "bglgwyng",
+        "repo": "lat-js-viewer",
         "rev": "5b6676d3088044a50b4ddf55c0e42d449bc50dd9",
-        "revCount": 6,
-        "type": "git",
-        "url": "ssh://git@github.com/bglgwyng/lat-js-viewer.git"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/bglgwyng/lat-js-viewer.git"
+        "owner": "bglgwyng",
+        "repo": "lat-js-viewer",
+        "type": "github"
       }
     },
     "lat-json-viewer": {
@@ -101,15 +101,15 @@
       "locked": {
         "lastModified": 1767878565,
         "narHash": "sha256-pK1jSU5qKT8uqRSe2HcrWwXrl8F2CFtKkwvPD+HAoRA=",
-        "ref": "refs/heads/main",
+        "owner": "bglgwyng",
+        "repo": "lat-json-viewer",
         "rev": "50f21c7c454a416606829ee7095e84665a77e4f9",
-        "revCount": 9,
-        "type": "git",
-        "url": "ssh://git@github.com/bglgwyng/lat-json-viewer.git"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/bglgwyng/lat-json-viewer.git"
+        "owner": "bglgwyng",
+        "repo": "lat-json-viewer",
+        "type": "github"
       }
     },
     "lat-plaintext-viewer": {
@@ -121,15 +121,15 @@
       "locked": {
         "lastModified": 1767879001,
         "narHash": "sha256-Bpj0qjvqEWNgIT07q1Sdq7uMg42J23rC4ZHDFEvcAHc=",
-        "ref": "refs/heads/main",
+        "owner": "bglgwyng",
+        "repo": "lat-plaintext-viewer",
         "rev": "35297d779e949acd4261f77bc05cd2d20b132899",
-        "revCount": 3,
-        "type": "git",
-        "url": "ssh://git@github.com/bglgwyng/lat-plaintext-viewer.git"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "ssh://git@github.com/bglgwyng/lat-plaintext-viewer.git"
+        "owner": "bglgwyng",
+        "repo": "lat-plaintext-viewer",
+        "type": "github"
       }
     },
     "nixpkgs": {
