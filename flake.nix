@@ -38,7 +38,9 @@
             overlays = [
               (import inputs.rust-overlay)
             ];
-            config = { };
+            config = {
+              allowBroken = true;
+            };
           };
           packages.default = pkgs.lib.makeOverridable (
             {
@@ -69,7 +71,7 @@
               '';
               cases = builtins.concatStringsSep "\n" (map mkCase rules);
             in
-            pkgs.writeShellScriptBin "lat" ''
+            (pkgs.writeShellScriptBin "lat" ''
               file="$1"
               shift
               case "$file" in
@@ -78,8 +80,15 @@
                   exec ${fallback}/bin/* "$file" "$@"
                   ;;
               esac
-            ''
+            '').overrideAttrs
+              {
+                pname = "lat";
+                version = "0.1.0";
+              }
           ) { };
+          packages.tarball = pkgs.runCommand "lat-${system}.tar.gz" { } ''
+            tar -czvf $out -C ${self'.packages.default}/bin .
+          '';
           formatter = pkgs.nixfmt-rfc-style;
         };
     };

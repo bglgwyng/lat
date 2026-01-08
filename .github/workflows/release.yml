@@ -1,0 +1,147 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            system: x86_64-linux
+          - os: ubuntu-latest
+            system: aarch64-linux
+          - os: macos-latest
+            system: aarch64-darwin
+          - os: macos-13
+            system: x86_64-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: DeterminateSystems/nix-installer-action@main
+
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Build tarball
+        run: |
+          if [[ "${{ matrix.system }}" == "aarch64-linux" ]]; then
+            nix build .#packages.aarch64-linux.tarball --system aarch64-linux
+          else
+            nix build .#packages.${{ matrix.system }}.tarball
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lat-${{ matrix.system }}
+          path: result
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          for dir in artifacts/lat-*/; do
+            system=$(basename "$dir" | sed 's/lat-//')
+            cp "$dir"/* "release/lat-${system}.tar.gz"
+          done
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+
+  homebrew:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Wait for release assets
+        run: sleep 10
+
+      - name: Download release assets and calculate SHA256
+        id: sha
+        run: |
+          mkdir -p assets
+
+          curl -L -o assets/lat-aarch64-darwin.tar.gz \
+            "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/lat-aarch64-darwin.tar.gz"
+          curl -L -o assets/lat-x86_64-darwin.tar.gz \
+            "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/lat-x86_64-darwin.tar.gz"
+          curl -L -o assets/lat-x86_64-linux.tar.gz \
+            "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/lat-x86_64-linux.tar.gz"
+
+          echo "sha256_aarch64_darwin=$(sha256sum assets/lat-aarch64-darwin.tar.gz | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          echo "sha256_x86_64_darwin=$(sha256sum assets/lat-x86_64-darwin.tar.gz | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          echo "sha256_x86_64_linux=$(sha256sum assets/lat-x86_64-linux.tar.gz | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Generate Homebrew formula
+        run: |
+          mkdir -p Formula
+          cat > Formula/lat.rb << EOF
+          class Lat < Formula
+            desc "cat for LLMs - display file contents in an LLM-friendly way"
+            homepage "https://github.com/${{ github.repository }}"
+            version "${{ steps.version.outputs.version }}"
+            license "MIT"
+
+            on_macos do
+              on_arm do
+                url "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/lat-aarch64-darwin.tar.gz"
+                sha256 "${{ steps.sha.outputs.sha256_aarch64_darwin }}"
+              end
+              on_intel do
+                url "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/lat-x86_64-darwin.tar.gz"
+                sha256 "${{ steps.sha.outputs.sha256_x86_64_darwin }}"
+              end
+            end
+
+            on_linux do
+              on_intel do
+                url "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/lat-x86_64-linux.tar.gz"
+                sha256 "${{ steps.sha.outputs.sha256_x86_64_linux }}"
+              end
+            end
+
+            def install
+              bin.install "lat"
+            end
+
+            test do
+              system "#{bin}/lat", "--help"
+            end
+          end
+          EOF
+
+      - name: Push to Homebrew tap
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        with:
+          source-directory: Formula
+          destination-github-username: ${{ github.repository_owner }}
+          destination-repository-name: homebrew-tap
+          target-branch: main
+          target-directory: Formula
+          commit-message: "lat ${{ steps.version.outputs.version }}"
+          user-email: github-actions[bot]@users.noreply.github.com
+          user-name: github-actions[bot]
