@@ -2,7 +2,19 @@
 
 `lat` is `cat` for LLMs. It outputs files in a format that LLMs can easily understand.
 
-## 
+## Installation
+
+### Nix
+
+```shell
+nix profile install github:bglgwyng/lat
+```
+
+Or run directly without installing:
+
+```shell
+nix run github:bglgwyng/lat -- <FILE>
+```
 
 ## Key Features
 
