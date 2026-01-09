@@ -12,8 +12,6 @@ jobs:
         include:
           - os: ubuntu-latest
             system: x86_64-linux
-          - os: ubuntu-latest
-            system: aarch64-linux
           - os: macos-latest
             system: aarch64-darwin
           - os: macos-13
@@ -27,12 +25,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
       - name: Build tarball
-        run: |
-          if [[ "${{ matrix.system }}" == "aarch64-linux" ]]; then
-            nix build .#packages.aarch64-linux.tarball --system aarch64-linux
-          else
-            nix build .#packages.${{ matrix.system }}.tarball
-          fi
+        run: nix build .#packages.${{ matrix.system }}.tarball
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
