@@ -79,11 +79,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1767878821,
+        "lastModified": 1767924126,
         "narHash": "sha256-ysB3pC32q/ie1RWKdLoP1LOsbqm90j8NDxRzlUBsi84=",
         "owner": "bglgwyng",
         "repo": "lat-js-viewer",
-        "rev": "5b6676d3088044a50b4ddf55c0e42d449bc50dd9",
+        "rev": "cf14f188a78ea710c00919fe31b52271022c803c",
         "type": "github"
       },
       "original": {
@@ -99,11 +99,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1767878565,
-        "narHash": "sha256-pK1jSU5qKT8uqRSe2HcrWwXrl8F2CFtKkwvPD+HAoRA=",
+        "lastModified": 1767924173,
+        "narHash": "sha256-U52Ex7BKpYnazGWv2+tSFOtCYQ6VqU/M6fMLWXEXCsY=",
         "owner": "bglgwyng",
         "repo": "lat-json-viewer",
-        "rev": "50f21c7c454a416606829ee7095e84665a77e4f9",
+        "rev": "b7955025d378d5a57b115f48731526943dd6403e",
         "type": "github"
       },
       "original": {
@@ -119,11 +119,11 @@
         "rust-overlay": "rust-overlay_3"
       },
       "locked": {
-        "lastModified": 1767879001,
+        "lastModified": 1767924191,
         "narHash": "sha256-Bpj0qjvqEWNgIT07q1Sdq7uMg42J23rC4ZHDFEvcAHc=",
         "owner": "bglgwyng",
         "repo": "lat-plaintext-viewer",
-        "rev": "35297d779e949acd4261f77bc05cd2d20b132899",
+        "rev": "bc82103ac1bd26a586ad0d5e0a2e4f9bd359641e",
         "type": "github"
       },
       "original": {
