@@ -4,6 +4,12 @@
 
 ## Installation
 
+### Homebrew
+
+```shell
+brew install bglgwyng/tap/lat
+```
+
 ### Nix
 
 ```shell
